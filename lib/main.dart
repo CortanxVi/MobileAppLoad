@@ -4,6 +4,8 @@ import 'package:mobilekakkak/screen/navmenu.dart';
 import 'package:mobilekakkak/screen/onboarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:mobilekakkak/screen/signup_screen.dart';
+import 'package:mobilekakkak/screen/login_screen.dart';
 
 bool? seen;
 
@@ -27,7 +29,8 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF2F2F7),
       ),
       // ถ้าเคยเห็น onboarding แล้วให้ไปหน้า NavigationMenu เลย
-      home: seen == true ? const NavigationMenu() : const OnboardingScreen(),
+      // home: seen == true ? const NavigationMenu() : const OnboardingScreen(),
+      home: const NavigationMenu(),
       debugShowCheckedModeBanner: false,
     );
   }

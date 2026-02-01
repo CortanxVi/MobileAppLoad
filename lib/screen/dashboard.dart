@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mobilekakkak/screen/navmenu.dart';
+import 'package:mobilekakkak/theme/punk_theme.dart'; // Import Punk Theme
+import 'package:mobilekakkak/theme/punk_widgets.dart';
 
 class Device {
   final String name;
   final IconData icon;
-  final Color color;
+  final Color color; // อาจจะไม่ใช้สีนี้แล้ว หรือใช้เป็น Accent แทน
   final String type;
   final bool isOn;
   final String? value;
@@ -19,25 +20,30 @@ class Device {
   });
 }
 
-// Dashboard Page
+// ============================================================
+// Dashboard Page (Punk Style)
+// ============================================================
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final void Function(Device device) onDeviceTap;
+
+  const DashboardPage({super.key, required this.onDeviceTap});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  // ข้อมูล Device (เหมือนเดิม)
   final List<Device> devices = [
     Device(
-      name: 'Living Room Light',
+      name: 'MAIN LIGHT',
       icon: Icons.lightbulb,
       color: Colors.orange,
       type: 'Light',
       isOn: true,
     ),
     Device(
-      name: 'Smart Thermostat',
+      name: 'THERMOSTAT',
       icon: Icons.thermostat,
       color: Colors.blue,
       type: 'Climate',
@@ -45,21 +51,21 @@ class _DashboardPageState extends State<DashboardPage> {
       value: '24°C',
     ),
     Device(
-      name: 'Security Camera',
+      name: 'CAMERA 01',
       icon: Icons.videocam,
       color: Colors.red,
       type: 'Camera',
       isOn: true,
     ),
     Device(
-      name: 'Smart Lock',
+      name: 'GATE LOCK',
       icon: Icons.lock,
       color: Colors.grey,
       type: 'Lock',
       isOn: false,
     ),
     Device(
-      name: 'WiFi Router',
+      name: 'NET LINK',
       icon: Icons.router,
       color: Colors.green,
       type: 'Network',
@@ -67,14 +73,14 @@ class _DashboardPageState extends State<DashboardPage> {
       value: '5GHz',
     ),
     Device(
-      name: 'Smart Speaker',
+      name: 'AUDIO SYS',
       icon: Icons.speaker,
       color: Colors.purple,
       type: 'Audio',
       isOn: false,
     ),
     Device(
-      name: 'Air Purifier',
+      name: 'PURIFIER',
       icon: Icons.air,
       color: Colors.teal,
       type: 'Appliance',
@@ -82,7 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
       value: 'Auto',
     ),
     Device(
-      name: 'Smart TV',
+      name: 'SMART TV',
       icon: Icons.tv,
       color: Colors.indigo,
       type: 'Entertainment',
@@ -97,44 +103,55 @@ class _DashboardPageState extends State<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(PunkSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Home',
-                  style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
+                // 1. ใช้ PunkTextStyles
                 Text(
-                  '${devices.where((d) => d.isOn).length} devices active',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  'CONTROL CENTER',
+                  style: PunkTextStyles.headline1.copyWith(fontSize: 28),
+                ),
+                const SizedBox(height: PunkSpacing.xs),
+                Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: PunkColors.primary,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: PunkColors.primary, blurRadius: 5),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${devices.where((d) => d.isOn).length} SYSTEMS ONLINE',
+                      style: PunkTextStyles.label.copyWith(
+                        color: PunkColors.onBackground.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: PunkSpacing.sm),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: PunkSpacing.sm,
+                mainAxisSpacing: PunkSpacing.sm,
                 childAspectRatio: 1.0,
               ),
               itemCount: devices.length,
               itemBuilder: (context, index) {
                 return DeviceCard(
                   device: devices[index],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            DeviceDetailPage(device: devices[index]),
-                      ),
-                    );
-                  },
+                  onTap: () => widget.onDeviceTap(devices[index]),
                 );
               },
             ),
@@ -145,6 +162,9 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
+// ============================================================
+// Device Card (Punk Style)
+// ============================================================
 class DeviceCard extends StatelessWidget {
   final Device device;
   final VoidCallback onTap;
@@ -156,58 +176,59 @@ class DeviceCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        // 2. ใช้ PunkBorders และ Effect
+        decoration: device.isOn
+            ? PunkBorders.primaryBorder.copyWith(
+                color: PunkColors.surface,
+              ) // Active
+            : BoxDecoration(
+                // Inactive
+                color: PunkColors.surface.withOpacity(0.5),
+                border: Border.all(
+                  color: PunkColors.onBackground.withOpacity(0.1),
+                ),
+              ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(PunkSpacing.sm),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: device.color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(device.icon, color: device.color, size: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    device.icon,
+                    // ถ้าเปิดใช้สี Primary (แดง), ถ้าปิดใช้สีขาวจางๆ
+                    color: device.isOn
+                        ? PunkColors.primary
+                        : PunkColors.onBackground.withOpacity(0.5),
+                    size: 32,
+                  ),
+                  if (device.isOn)
+                    const Icon(
+                      Icons.circle,
+                      size: 8,
+                      color: PunkColors.primary,
+                    ),
+                ],
               ),
               const Spacer(),
               Text(
                 device.name,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                style: PunkTextStyles.bodyText.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: device.isOn ? Colors.green : Colors.grey,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    device.value ?? (device.isOn ? 'On' : 'Off'),
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                ],
+              Text(
+                device.value ?? (device.isOn ? 'ONLINE' : 'OFFLINE'),
+                style: PunkTextStyles.label.copyWith(
+                  color: device.isOn
+                      ? PunkColors.primary
+                      : PunkColors.onBackground.withOpacity(0.4),
+                ),
               ),
             ],
           ),
@@ -217,11 +238,18 @@ class DeviceCard extends StatelessWidget {
   }
 }
 
-// Device Detail Page
+// ============================================================
+// Device Detail Page (Punk Style)
+// ============================================================
 class DeviceDetailPage extends StatefulWidget {
   final Device device;
+  final VoidCallback onClose;
 
-  const DeviceDetailPage({super.key, required this.device});
+  const DeviceDetailPage({
+    super.key,
+    required this.device,
+    required this.onClose,
+  });
 
   @override
   State<DeviceDetailPage> createState() => _DeviceDetailPageState();
@@ -241,164 +269,125 @@ class _DeviceDetailPageState extends State<DeviceDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F7),
+      backgroundColor: PunkColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.close, color: PunkColors.onBackground),
+          onPressed: widget.onClose,
         ),
         title: Text(
-          widget.device.type,
-          style: const TextStyle(color: Colors.black, fontSize: 16),
+          widget.device.type.toUpperCase(),
+          style: PunkTextStyles.label,
         ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(PunkSpacing.md),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: widget.device.color.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  widget.device.icon,
-                  size: 64,
-                  color: widget.device.color,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: Text(
-                widget.device.name,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 32),
+            // Icon Glow Effect
             Container(
-              padding: const EdgeInsets.all(20),
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isOn
+                      ? PunkColors.primary
+                      : PunkColors.onBackground.withOpacity(0.2),
+                  width: 3,
+                ),
+                boxShadow: isOn ? PunkShadows.glow : [],
+                color: PunkColors.surface,
+              ),
+              child: Icon(
+                widget.device.icon,
+                size: 64,
+                color: isOn
+                    ? PunkColors.primary
+                    : PunkColors.onBackground.withOpacity(0.5),
+              ),
+            ),
+            const SizedBox(height: PunkSpacing.lg),
+
+            Text(
+              widget.device.name,
+              style: PunkTextStyles.headline2,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: PunkSpacing.xl),
+
+            // Controls Container
+            Container(
+              padding: const EdgeInsets.all(PunkSpacing.md),
+              decoration: PunkBorders.primaryBorder.copyWith(
+                color: PunkColors.surface,
               ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Power',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text('SYSTEM POWER', style: PunkTextStyles.bodyText),
                       Switch(
                         value: isOn,
-                        onChanged: (value) {
-                          setState(() {
-                            isOn = value;
-                          });
-                        },
-                        activeColor: widget.device.color,
+                        onChanged: (value) => setState(() => isOn = value),
+                        activeColor: PunkColors.primary,
+                        activeTrackColor: PunkColors.primary.withOpacity(0.3),
+                        inactiveThumbColor: PunkColors.onBackground,
+                        inactiveTrackColor: PunkColors.background,
                       ),
                     ],
                   ),
+
                   if (widget.device.type == 'Light') ...[
-                    const Divider(height: 32),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const Divider(
+                      color: PunkColors.primary,
+                      thickness: 1,
+                      height: 40,
+                    ),
+                    Text('OUTPUT LEVEL', style: PunkTextStyles.label),
+                    const SizedBox(height: 10),
+                    Slider(
+                      value: brightness,
+                      onChanged: isOn
+                          ? (v) => setState(() => brightness = v)
+                          : null,
+                      activeColor: PunkColors.primary,
+                      inactiveColor: PunkColors.onBackground.withOpacity(0.2),
+                    ),
+                  ],
+
+                  if (widget.device.type == 'Climate') ...[
+                    const Divider(
+                      color: PunkColors.primary,
+                      thickness: 1,
+                      height: 40,
+                    ),
+                    Text('TARGET TEMP', style: PunkTextStyles.label),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Brightness',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                        IconButton(
+                          icon: const Icon(
+                            Icons.remove,
+                            color: PunkColors.primary,
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Slider(
-                          value: brightness,
-                          onChanged: isOn
-                              ? (value) {
-                                  setState(() {
-                                    brightness = value;
-                                  });
-                                }
-                              : null,
-                          activeColor: widget.device.color,
+                          onPressed: () => setState(() => temperature--),
                         ),
                         Text(
-                          '${(brightness * 100).round()}%',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
+                          '${temperature.round()}°C',
+                          style: PunkTextStyles.headline1,
                         ),
-                      ],
-                    ),
-                  ],
-                  if (widget.device.type == 'Climate') ...[
-                    const Divider(height: 32),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Temperature',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                        IconButton(
+                          icon: const Icon(
+                            Icons.add,
+                            color: PunkColors.primary,
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove_circle_outline),
-                              onPressed: isOn
-                                  ? () {
-                                      setState(() {
-                                        if (temperature > 16) temperature--;
-                                      });
-                                    }
-                                  : null,
-                              iconSize: 32,
-                              color: widget.device.color,
-                            ),
-                            const SizedBox(width: 24),
-                            Text(
-                              '${temperature.round()}°C',
-                              style: const TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 24),
-                            IconButton(
-                              icon: const Icon(Icons.add_circle_outline),
-                              onPressed: isOn
-                                  ? () {
-                                      setState(() {
-                                        if (temperature < 30) temperature++;
-                                      });
-                                    }
-                                  : null,
-                              iconSize: 32,
-                              color: widget.device.color,
-                            ),
-                          ],
+                          onPressed: () => setState(() => temperature++),
                         ),
                       ],
                     ),
@@ -406,45 +395,15 @@ class _DeviceDetailPageState extends State<DeviceDetailPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Settings',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSettingItem(Icons.schedule, 'Schedule'),
-                  _buildSettingItem(Icons.notifications, 'Notifications'),
-                  _buildSettingItem(Icons.info_outline, 'Device Info'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildSettingItem(IconData icon, String title) {
-    return InkWell(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.grey[600]),
-            const SizedBox(width: 16),
-            Text(title, style: const TextStyle(fontSize: 16)),
-            const Spacer(),
-            Icon(Icons.chevron_right, color: Colors.grey[400]),
+            const SizedBox(height: PunkSpacing.md),
+            // ปุ่มแบบ PunkButton
+            PunkButton(
+              onPressed: () {},
+              text: 'ADVANCED SETTINGS',
+              isPrimary: false,
+              icon: Icons.settings,
+            ),
           ],
         ),
       ),
@@ -452,33 +411,35 @@ class _DeviceDetailPageState extends State<DeviceDetailPage> {
   }
 }
 
-// Search Page
-class SearchPage extends StatelessWidget {
+// ============================================================
+// Search Page (Punk Style)
+// ============================================================
+class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
+
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(PunkSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Search Devices',
-              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search for devices...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
+            const Text('SEARCH DATABASE', style: PunkTextStyles.headline1),
+            const SizedBox(height: PunkSpacing.md),
+            // 3. ใช้ PunkTextField
+            PunkTextField(
+              controller: _searchController,
+              obscureText: false,
+              labelText: 'ENTER DEVICE ID...',
+              prefixIcon: Icons.search,
             ),
           ],
         ),
@@ -487,7 +448,9 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-// Automation Page
+// ============================================================
+// Automation Page (Punk Style)
+// ============================================================
 class AutomationPage extends StatelessWidget {
   const AutomationPage({super.key});
 
@@ -495,121 +458,43 @@ class AutomationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(PunkSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Automation',
-              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
+            const Text('AUTOMATION', style: PunkTextStyles.headline1),
+            const SizedBox(height: PunkSpacing.xl),
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.auto_awesome, size: 80, color: Colors.grey[400]),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No automations yet',
-                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: PunkColors.primary, width: 2),
+                        boxShadow: PunkShadows.glow,
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome,
+                        size: 60,
+                        color: PunkColors.primary,
+                      ),
                     ),
+                    const SizedBox(height: PunkSpacing.md),
+                    Text(
+                      'NO ACTIVE SCRIPTS',
+                      style: PunkTextStyles.bodyText.copyWith(
+                        color: PunkColors.onBackground.withOpacity(0.5),
+                      ),
+                    ),
+                    const SizedBox(height: PunkSpacing.lg),
+                    PunkButton(onPressed: () {}, text: 'CREATE NEW RULE'),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Profile Page
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Profile',
-              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-            Center(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage('assets/images/sun.jpeg'),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'ก็แดดมันร้อน คนไม่ใช่หุ่นยนต์',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'sunshortmusic@tiktok.com',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  _buildProfileItem(Icons.settings, 'Settings'),
-                  const Divider(height: 1),
-                  _buildProfileItem(Icons.help_outline, 'Help & Support'),
-                  const Divider(height: 1),
-                  _buildProfileItem(
-                    Icons.logout,
-                    'Logout',
-                    isDestructive: true,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileItem(
-    IconData icon,
-    String title, {
-    bool isDestructive = false,
-  }) {
-    return InkWell(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(icon, color: isDestructive ? Colors.red : Colors.grey[700]),
-            const SizedBox(width: 16),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                color: isDestructive ? Colors.red : Colors.black,
-              ),
-            ),
-            const Spacer(),
-            Icon(Icons.chevron_right, color: Colors.grey[400]),
           ],
         ),
       ),
